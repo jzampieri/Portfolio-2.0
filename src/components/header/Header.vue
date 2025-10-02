@@ -2,7 +2,6 @@
     <main class="container-header">
         <header>
             <section>
-                <img src="/img/menu.png" alt="Logo" class="logo">
                 <h1>Zampieri</h1>
             </section>
         </header>

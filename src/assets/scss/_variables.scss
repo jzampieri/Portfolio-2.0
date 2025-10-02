@@ -7,6 +7,49 @@ $cinza-escuro: #68696b;
 $roxo: #A51EED;
 $roxo-escuro: #710AA8;
 
+$surface-1: mix($preto, #0f0f11, 60%);
+$surface-2: mix($preto, #0b0b0d, 50%);
+$stroke-1: mix($cinza-medio, $preto, 55%);
+$muted-1: lighten($cinza-escuro, 25%);
+$muted-2: lighten($cinza-escuro, 40%);
+$accent: $roxo;
+
+$ci-padding: .75rem;
+$ci-radius: 1rem;
+$gap: .5rem;
+$btn-radius: .8rem;
+$icon-size: 34px;
+$send-size: 40px;
+
+$ci-bg: $surface-1;
+$ci-border: $stroke-1;
+$ci-shadow: 0 10px 30px rgba(0,0,0,.25);
+$composer-bg: $surface-2;
+$composer-border: $stroke-1;
+$composer-radius: .9rem;
+
+$icon-color: lighten($cinza-escuro, 35%);
+$icon-hover-bg: rgba(0,0,0,.25);
+
+$input-text-dark: $branco;
+$input-placeholder-dark: $muted-2;
+$input-border-focus: $roxo;
+
+$chip-bg: rgba(255,255,255,.03);
+$chip-bg-hover: rgba(255,255,255,.06);
+$chip-border: rgba(255,255,255,.08);
+$chip-border-hover: rgba(255,255,255,.14);
+$chip-text: $branco;
+$chip-icon-color: $muted-2;
+
+$send-bg: $roxo;
+$send-bg-hover: lighten($roxo, 8%);
+$send-bg-active: $roxo-escuro;
+$send-text: $branco;
+$send-shadow: 0 6px 16px rgba(113,10,168,.35);
+
+
+
 $mg_large: 100px;
 $mg_extra: 150px;
 $mg: 50px;
