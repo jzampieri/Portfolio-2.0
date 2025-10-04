@@ -19,7 +19,7 @@ export default {
     }
 
     header{
-        color: $branco;
+        // color: $branco;
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -32,9 +32,6 @@ export default {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            img{
-                width: 2rem;
-            }
         }
     }
 </style>

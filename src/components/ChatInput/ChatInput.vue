@@ -1,399 +1,242 @@
 <template>
-  <div class="chat-input" :class="{ disabled, loading }">
-    <ul v-if="suggestions && suggestions.length" class="quick-suggestions" role="list">
-    <li
-        v-for="(s, i) in suggestions"
-        :key="i"
-        class="chip"
-        role="button"
-        tabindex="0"
-        @click="applySuggestion(s)"
-        @keydown.enter.prevent="applySuggestion(s)"
-        @keydown.space.prevent="applySuggestion(s)"
-    >
-        <span v-if="normalizeIcon(s)" class="chip-icon" aria-hidden="true">
-        <svg v-if="normalizeIcon(s)?.type === 'svg'" viewBox="0 0 24 24">
-            <path :d="normalizeIcon(s).path" />
-        </svg>
-        <span v-else-if="normalizeIcon(s)?.type === 'emoji'" class="emoji">
-            {{ normalizeIcon(s).emoji }}
-        </span>
-        </span>
-
-        <span class="chip-label">{{ normalizeLabel(s) }}</span>
-    </li>
-    </ul>
-
-    <div class="composer">
-
-        <textarea
-        ref="ta"
-        class="input"
+  <div class="chat-wrap">
+    <!-- INPUT -->
+    <div class="chat-input" :class="{ disabled, loading }">
+      <input
+        ref="inputEl"
+        :value="modelValue"
         :placeholder="placeholder"
-        :value="innerValue"
-        :rows="1"
-        :maxlength="maxlength || null"
-        :disabled="disabled"
-        @input="onInput"
-        @keydown="onKeydown"
-        :style="{
-            minHeight: inputMinHeight + 'px',
-            fontSize: inputFontSize,
-            padding: inputPaddingY + ' ' + inputPaddingX
-        }"
-        />
+        :disabled="disabled || loading"
+        class="ci-field"
+        type="text"
+        autocomplete="off"
+        autocapitalize="sentences"
+        :aria-label="ariaLabel || placeholder"
+        @input="$emit('update:modelValue', $event.target.value)"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
+        @keydown.enter.prevent="handleSubmit"
+      />
 
-      <div class="actions">
-        <span v-if="showCounter && maxlength" class="counter">
-          {{ innerValue.length }}/{{ maxlength }}
+      <button
+        class="ci-send"
+        :title="btnTitle"
+        :disabled="sendDisabled"
+        @click="handleSubmit"
+      >
+        <span v-if="!loading" class="ci-icon">
+          <fa :icon="['fas','paper-plane']" />
         </span>
-
-        <button
-          v-if="loading"
-          type="button"
-          class="pill-btn stop"
-          @click="$emit('stop')"
-        >Parar</button>
-
-        <button
-          v-else
-          type="button"
-          class="send-btn"
-          :disabled="!canSend || disabled"
-          @click="submit"
-          title="Enviar (Enter) • Nova linha (Shift+Enter)"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.6 22 12 3.4 3.4 3 10l12 2-12 2z"/></svg>
-        </button>
-      </div>
+        <span v-else class="ci-spinner"></span>
+        <span class="sr-only">Enviar</span>
+      </button>
     </div>
 
-    <!-- <div class="hints">
-      <span>Enter: enviar</span>
-      <span>Shift + Enter: nova linha</span>
-      <span>Ctrl/Cmd + K: limpar</span>
-    </div> -->
+    <!-- PRESETS -->
+    <div v-if="computedPresets.length" class="ci-presets" role="list">
+      <button
+        v-for="(item, i) in computedPresets"
+        :key="i"
+        class="ci-chip"
+        type="button"
+        role="listitem"
+        :title="item.label"
+        @click="onPresetClick(item)"
+      >
+        <span class="ci-chip-icon" aria-hidden="true">
+          <fa :icon="item.icon || ['fas','circle']" />
+        </span>
+        <span class="ci-chip-label">{{ item.label }}</span>
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-    name: 'ChatInput',
-    props: {
-        modelValue: { type: String, default: '' },
-        placeholder: { type: String, default: 'Escreva sua mensagem…' },
-        disabled: { type: Boolean, default: false },
-        loading: { type: Boolean, default: false },
-        maxlength: { type: Number, default: null },
-        showCounter: { type: Boolean, default: false },
-        suggestions: { type: Array, default: () => [] },
-        inputMinHeight: { type: Number, default: 64 },    
-        inputMaxHeight: { type: Number, default: 260 },    
-        inputFontSize: { type: String, default: '1.05rem' },
-        inputPaddingY: { type: String, default: '.8rem' },
-        inputPaddingX: { type: String, default: '.6rem' },
-        width: { type: String, default: '100%' },   
-        maxWidth: { type: String, default: null } 
-    },
-    emits: ['update:modelValue', 'submit', 'stop', 'attach', 'typing', 'clear'],
-    data () {
-        return { innerValue: this.modelValue }
-    },
-    computed: {
-        canSend () {
-        return this.innerValue && this.innerValue.trim().length > 0
-        }
-    },
-    watch: {
-        modelValue (v) {
-        if (v !== this.innerValue) {
-            this.innerValue = v || ''
-            this.$nextTick(this.autosize)
-        }
-        }
-    },
-    mounted () {
-        this.autosize()
-        window.addEventListener('keydown', this.onGlobalKeydown)
-    },
-    beforeUnmount () {
-        window.removeEventListener('keydown', this.onGlobalKeydown)
-    },
-    methods: {
-    autosize () {
-        const el = this.$refs.ta
-        if (!el) return
-        el.style.height = 'auto'
-        const max = this.inputMaxHeight || 260
-        el.style.height = Math.min(el.scrollHeight, max) + 'px'
-        el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden'
-    },
-    onInput (e) {
-        this.innerValue = e.target.value
-        this.$emit('update:modelValue', this.innerValue)
-        this.$emit('typing', this.innerValue)
-        this.autosize()
-    },
-    onKeydown (e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        this.submit()
-        }
-    },
-    onGlobalKeydown (e) {
-        const isCmdK = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'
-        if (isCmdK && !this.disabled) {
-        e.preventDefault()
-        this.clear()
-        }
-    },
-    normalizeLabel (s) {
-        if (typeof s === 'string') return s
-        return s?.label || s?.value || ''
-    },
-    normalizeValue (s) {
-        if (typeof s === 'string') return s
-        return s?.value || s?.label || ''
-    },
-    normalizeIcon (s) {
-        if (!s || typeof s === 'string' || !s.icon) return null
-        const ic = s.icon
-        if (ic.type === 'svg' && ic.path) return { type: 'svg', path: ic.path }
-        if (ic.type === 'emoji' && ic.emoji) return { type: 'emoji', emoji: ic.emoji }
-        return null
-    },
-    applySuggestion (s) {
-        if (this.disabled || this.loading) return
-        const text = this.normalizeValue(s)
-        const sep = this.innerValue && !this.innerValue.endsWith(' ') ? ' ' : ''
-        this.innerValue = (this.innerValue || '') + sep + text
-        this.$emit('update:modelValue', this.innerValue)
-        this.$nextTick(() => {
-        const el = this.$refs.ta
-        if (el) el.focus()
-        this.autosize()
-        })
-    },
-    submit () {
-        if (!this.canSend || this.disabled) return
-        const msg = this.innerValue.trim()
-        this.$emit('submit', msg)
-        this.innerValue = ''
-        this.$emit('update:modelValue', '')
-        this.$nextTick(this.autosize)
-    },
-    clear () {
-        this.innerValue = ''
-        this.$emit('update:modelValue', '')
-        this.$emit('clear')
-        this.$nextTick(this.autosize)
-    }
-    }
+  name: 'ChatInput',
+  props: {
+    modelValue: { type: String, default: '' },
+    placeholder: { type: String, default: 'Ask me anything...' },
+    ariaLabel: { type: String, default: '' },
+    disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
+    autofocus: { type: Boolean, default: false },
+    trimOnSubmit: { type: Boolean, default: true },
 
+    /**
+     * presets: [{ label, value, icon?: ['fas','...'], action?: 'fill'|'submit' }]
+     * - fill: preenche o input com o value
+     * - submit: dispara imediatamente o submit com o value
+     */
+    presets: {
+      type: Array,
+      default: () => ([
+        { label: 'Me', value: 'Tell me about Julio.', icon: ['far','face-smile'], action: 'fill'},
+        { label: 'Projects', value: 'List my main projects and links.', icon: ['fas','bag-shopping'], action: 'fill'   },
+        { label: 'Skills', value: 'What are my top hard and soft skills?', icon: ['fas','layer-group'], action: 'fill'   },
+        { label: 'Fun', value: 'Share a fun fact about me.', icon: ['fas','wand-magic-sparkles'], action: 'fill' },
+        { label: 'Contact', value: 'How can people contact me?', icon: ['fas','user-lock'], action: 'fill'   }
+      ])
+    }
+  },
+  emits: ['update:modelValue', 'submit', 'focus', 'blur'],
+  computed: {
+    sendDisabled () {
+      return this.disabled || this.loading || !(this.modelValue && this.modelValue.trim().length)
+    },
+    btnTitle () {
+      return this.loading ? 'Enviando...' : 'Enviar'
+    },
+    computedPresets () {
+      return Array.isArray(this.presets) ? this.presets : []
+    }
+  },
+  mounted () {
+    if (this.autofocus) this.$refs.inputEl?.focus()
+  },
+  methods: {
+    handleSubmit () {
+      if (this.sendDisabled) return
+      const payload = this.trimOnSubmit ? (this.modelValue || '').trim() : (this.modelValue || '')
+      this.$emit('submit', payload)
+    },
+    onPresetClick (item) {
+      const value = (item?.value || '').trim()
+      if (!value) return
+      this.$emit('update:modelValue', value)
+      if (item.action === 'submit') {
+        requestAnimationFrame(() => this.$emit('submit', value))
+      } else {
+        this.$refs.inputEl?.focus()
+      }
+    }
+  }
 }
-
 </script>
 
 <style lang="scss" scoped>
-
-.chat-input {
-  display: grid;
-  gap: $gap;
-  background: var(--ci-bg, $ci-bg);
-  padding: $ci-padding;
-  border-radius: $ci-radius;
-  border: 1px solid $ci-border;
-  box-shadow: $ci-shadow;
-  transition: border-color .2s ease;
-
-  &.disabled {
-    opacity: .6;
-    pointer-events: none;
-  }
-}
-
-.quick-suggestions {
+.chat-wrap {
   display: flex;
-  flex-wrap: wrap;
-  gap: .4rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }
 
-.chip {
+/* INPUT */
+.chat-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 999px;
+  background: $color-bg-glass;
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid $color-border;
+  box-shadow: 0 6px 24px rgba(0,0,0,.06), inset 0 1px 0 rgba(255,255,255,.4);
+
+  &.disabled { opacity: .6; pointer-events: none; }
+}
+
+.ci-field {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.25;
+  color: $color-text;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 10px $mg_mini;
+
+  &::placeholder { color: $color-text-light; }
+}
+
+.ci-send {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  background: $gradient-primary;
   display: inline-flex;
   align-items: center;
-  gap: .45rem;
-  padding: .42rem .62rem;
-  border-radius: 999px;
-  border: 1px solid $chip-border;
-  background: $chip-bg;
-  color: $chip-text;
-  font-size: .9rem;
-  line-height: 1;
-  cursor: pointer;
-  user-select: none;
-  transition: border-color .15s ease, background-color .15s ease, transform .04s ease;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(10,132,255,.35), inset 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
 
-  &:hover {
-    background: $chip-bg-hover;
-    border-color: $chip-border-hover;
-  }
-  &:active {
-    transform: translateY(1px);
-  }
-  &:focus-visible {
-    outline: 0;
-    box-shadow: 0 0 0 2px rgba($accent, .22);
-    border-color: mix($accent, $chip-border-hover, 60%);
-  }
+  &:hover { transform: translateY(-1px); }
+  &:active { transform: translateY(0); box-shadow: 0 3px 10px rgba(10,132,255,.35); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
 }
 
-.chip-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
+.ci-icon { font-size: 18px; }
 
-  svg {
-    width: 18px;
-    height: 18px;
-    fill: $chip-icon-color;
-  }
-  .emoji {
-    font-size: 16px;
-    line-height: 1;
-    opacity: .9;
-  }
+.ci-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.45);
+  border-top-color: rgba(255,255,255,1);
+  animation: spin 1s linear infinite;
 }
 
-.chip-label {
-  white-space: nowrap;
-  max-width: 22ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: $chip-text;
-  opacity: .95;
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.chip:hover .chip-label { opacity: 1 }
-
-.composer {
+/* PRESETS (chips/cards) */
+.ci-presets {
   display: grid;
-  grid-template-columns: auto max-content;
-  align-items: end;
-  gap: $gap;
-  background: $composer-bg;
-  border: 1px solid $composer-border;
-  border-radius: $composer-radius;
-  padding: .5rem .5rem .5rem .25rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (max-width: 520px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.icon-btn {
+.ci-chip {
   appearance: none;
-  border: 0;
-  background: transparent;
-  width: $icon-size;
-  height: $icon-size;
-  border-radius: .7rem;
-  display: grid;
-  place-items: center;
-  margin: .25rem;
-  cursor: pointer;
-  transition: background-color .15s ease, transform .05s ease;
-
-  svg {
-    width: 18px;
-    height: 18px;
-    fill: $icon-color;
-  }
-  &:hover { background: $icon-hover-bg }
-  &:active { transform: translateY(1px) }
-}
-
-.input {
-  grid-column: 1 / span 1;
-  width: 100%;
-  resize: none;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: $input-text-dark;
-  font-size: 1rem;
-  line-height: 1.45;
-  padding: .6rem .4rem .6rem .2rem;
-
-  &::placeholder { color: $input-placeholder-dark }
-}
-
-.composer:focus-within {
-  border-color: mix($accent, $stroke-1, 65%);
-  box-shadow: 0 0 0 1px rgba($accent, .18);
-}
-
-.actions {
+  background: $color-bg-alt;
+  border: 1px solid $color-gray-200;
+  color: $color-text;
+  border-radius: 18px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
-  gap: $gap;
+  gap: 10px;
+  justify-content: center;
+  cursor: pointer;
+
+  // efeito glass leve
+  background: linear-gradient(0deg, rgba(255,255,255,0.65), rgba(255,255,255,0.65)), $gradient-glass;
+  box-shadow: 0 6px 16px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,.5);
+
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+  &:hover   { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.06); }
+  &:active  { transform: translateY(0); }
 }
 
-.counter {
-  color: $muted-1;
-  font-size: .8rem;
-  margin-right: .25rem;
+.ci-chip-icon {
+  font-size: 18px;
+  opacity: .9;
 }
 
-.pill-btn {
-  appearance: none;
-  border: 1px solid $chip-border;
-  background: lighten($composer-bg, 3%);
-  color: $input-text-dark;
-  padding: .45rem .75rem;
-  border-radius: .7rem;
+.ci-chip-label {
   font-weight: 600;
-  cursor: pointer;
-  transition: border-color .15s ease, background-color .15s ease;
-
-  &:hover {
-    border-color: lighten($chip-border, 8%);
-    background: lighten($composer-bg, 6%);
-  }
-  &:active { transform: translateY(1px) }
+  font-size: 14px;
+  color: $color-text;
 }
 
-.send-btn {
-  appearance: none;
-  border: 0;
-  background: linear-gradient(180deg, $send-bg, $send-bg-active);
-  color: $send-text;
-  width: $send-size;
-  height: $send-size;
-  border-radius: $btn-radius;
-  display: grid;
-  place-items: center;
-  box-shadow: $send-shadow;
-  cursor: pointer;
-  transition: background-color .15s ease, transform .05s ease, box-shadow .15s ease;
-
-  svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-    transform: translateX(1px);
-  }
-  &:hover { filter: brightness(1.05) }
-  &:active { transform: translateY(1px) }
-  &:disabled {
-    filter: grayscale(.5);
-    opacity: .6;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .composer { grid-template-columns: 1fr max-content }
+/* A11y helper */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 </style>

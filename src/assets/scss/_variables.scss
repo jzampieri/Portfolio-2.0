@@ -1,52 +1,35 @@
-// PALETA DE CORES
-$branco: #FEFEFE;
-$preto: #222222;
-$cinza-claro: #ccccd6;
-$cinza-medio: #91969c;
-$cinza-escuro: #68696b;
-$roxo: #A51EED;
-$roxo-escuro: #710AA8;
+$color-bg: #f5f7fa; 
+$color-bg-alt: #ffffff; 
+$color-bg-glass: rgba(255, 255, 255, 0.6); 
 
-$surface-1: mix($preto, #0f0f11, 60%);
-$surface-2: mix($preto, #0b0b0d, 50%);
-$stroke-1: mix($cinza-medio, $preto, 55%);
-$muted-1: lighten($cinza-escuro, 25%);
-$muted-2: lighten($cinza-escuro, 40%);
-$accent: $roxo;
+$color-text: #111111; 
+$color-text-light: #6e6e73; 
+$color-text-placeholder: #9e9ea7; 
 
-$ci-padding: .75rem;
-$ci-radius: 1rem;
-$gap: .5rem;
-$btn-radius: .8rem;
-$icon-size: 34px;
-$send-size: 40px;
+$color-border: rgba(0, 0, 0, 0.1);
+$color-shadow: rgba(0, 0, 0, 0.15);
 
-$ci-bg: $surface-1;
-$ci-border: $stroke-1;
-$ci-shadow: 0 10px 30px rgba(0,0,0,.25);
-$composer-bg: $surface-2;
-$composer-border: $stroke-1;
-$composer-radius: .9rem;
+$color-primary: #007aff;
+$color-success: #34c759; 
+$color-warning: #ffcc00; 
+$color-danger: #ff3b30; 
+$color-info: #5ac8fa; 
 
-$icon-color: lighten($cinza-escuro, 35%);
-$icon-hover-bg: rgba(0,0,0,.25);
+$gradient-primary: linear-gradient(135deg, #0a84ff 0%, #5ac8fa 100%);
+$gradient-success: linear-gradient(135deg, #30d158 0%, #34c759 100%);
+$gradient-danger: linear-gradient(135deg, #ff453a 0%, #ff3b30 100%);
+$gradient-warning: linear-gradient(135deg, #ffd60a 0%, #ffcc00 100%);
+$gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 100%);
 
-$input-text-dark: $branco;
-$input-placeholder-dark: $muted-2;
-$input-border-focus: $roxo;
-
-$chip-bg: rgba(255,255,255,.03);
-$chip-bg-hover: rgba(255,255,255,.06);
-$chip-border: rgba(255,255,255,.08);
-$chip-border-hover: rgba(255,255,255,.14);
-$chip-text: $branco;
-$chip-icon-color: $muted-2;
-
-$send-bg: $roxo;
-$send-bg-hover: lighten($roxo, 8%);
-$send-bg-active: $roxo-escuro;
-$send-text: $branco;
-$send-shadow: 0 6px 16px rgba(113,10,168,.35);
+$color-gray-100: #f2f2f7;
+$color-gray-200: #e5e5ea;
+$color-gray-300: #d1d1d6;
+$color-gray-400: #c7c7cc;
+$color-gray-500: #aeaeb2;
+$color-gray-600: #8e8e93;
+$color-gray-700: #636366;
+$color-gray-800: #48484a;
+$color-gray-900: #1c1c1e;
 
 
 

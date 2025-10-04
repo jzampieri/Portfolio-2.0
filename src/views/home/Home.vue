@@ -4,28 +4,19 @@
             <Header/>
         </header>
         <section class="chat-input">
-            <ChatInput
-                v-model="draft"
-                :inputMinHeight="40"
-                :inputMaxHeight="320"
-                inputFontSize="1.1rem"
-                inputPaddingY="1rem"
-                inputPaddingX=".8rem"
-                :loading="sending"
-                :disabled="false"
-                :maxlength="800"
-                :showCounter="true"
-                :suggestions="[
-                    { label: 'Quem é você?', value: 'Quem é você?', icon: { type: 'emoji', emoji: '👤' } },
-                    { label: 'Projetos recentes', value: 'Fale dos seus projetos mais recentes', icon: { type: 'svg', path: 'M3 7h18v2H3zm0 4h12v2H3zm0 4h18v2H3z' } },
-                    { label: 'Skills', value: 'Liste suas principais skills', icon: { type: 'emoji', emoji: '🛠️' } },
-                    'Contato'
+            <article>
+                <ChatInput
+                v-model="query"
+                :presets="[
+                    { label: 'Me', value: 'Quem é o Julio?', icon: ['far','face-smile'], action: 'fill' },
+                    { label: 'Projects', value: 'Mostre meus projetos recentes',  icon: ['fas','bag-shopping'], action: 'submit' },
+                    { label: 'Skills', value: 'Quais são minhas skills?', icon: ['fas','layer-group'], action: 'fill' },
+                    { label: 'Fun', value: 'Conte um fun fact', icon: ['fas','wand-magic-sparkles'], action: 'fill' },
+                    { label: 'Contact', value: 'Formas de contato', icon: ['fas','user-lock'], action: 'fill' }
                 ]"
-                placeholder="Pergunte algo sobre o Julio…"
-                @submit="onSubmit"
-                @stop="onStop"
-                @attach="onAttach"
-            />
+                @submit="handleSearch"
+                />
+            </article>
         </section>
     </main>
     </template>
@@ -43,9 +34,28 @@ export default {
 </script>
 <style lang="scss" scoped>
 
-    .main{
-        background-color: $preto;
+    .main {
+        background-color: $color-bg;
         height: 100vh;
+        width: 100%;
+
+        display: flex;
+        flex-direction: column;
+
+        header {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
     }
+
+    .chat-input {
+        margin-top: auto;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        margin-bottom: $mg;
+    }
+
 
 </style>
