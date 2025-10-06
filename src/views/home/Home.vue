@@ -7,13 +7,7 @@
             <article>
                 <ChatInput
                 v-model="query"
-                :presets="[
-                    { label: 'Me', value: 'Quem é o Julio?', icon: ['far','face-smile'], action: 'fill' },
-                    { label: 'Projects', value: 'Mostre meus projetos recentes',  icon: ['fas','bag-shopping'], action: 'submit' },
-                    { label: 'Skills', value: 'Quais são minhas skills?', icon: ['fas','layer-group'], action: 'fill' },
-                    { label: 'Fun', value: 'Conte um fun fact', icon: ['fas','wand-magic-sparkles'], action: 'fill' },
-                    { label: 'Contact', value: 'Formas de contato', icon: ['fas','user-lock'], action: 'fill' }
-                ]"
+                :presets="default"
                 @submit="handleSearch"
                 />
             </article>

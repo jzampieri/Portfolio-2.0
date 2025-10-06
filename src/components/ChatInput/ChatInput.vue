@@ -1,6 +1,7 @@
 <template>
   <div class="chat-wrap">
-    <!-- INPUT -->
+  <!-- ROW: INPUT -->
+  <div class="ci-row">
     <div class="chat-input" :class="{ disabled, loading }">
       <input
         ref="inputEl"
@@ -17,7 +18,6 @@
         @blur="$emit('blur')"
         @keydown.enter.prevent="handleSubmit"
       />
-
       <button
         class="ci-send"
         :title="btnTitle"
@@ -28,12 +28,13 @@
           <fa :icon="['fas','paper-plane']" />
         </span>
         <span v-else class="ci-spinner"></span>
-        <span class="sr-only">Enviar</span>
       </button>
     </div>
+  </div>
 
-    <!-- PRESETS -->
-    <div v-if="computedPresets.length" class="ci-presets" role="list">
+  <!-- ROW: PRESETS -->
+  <div class="ci-presets-row" v-if="computedPresets.length">
+    <div class="ci-presets" role="list">
       <button
         v-for="(item, i) in computedPresets"
         :key="i"
@@ -48,6 +49,7 @@
         </span>
         <span class="ci-chip-label">{{ item.label }}</span>
       </button>
+    </div>
     </div>
   </div>
 </template>
@@ -73,10 +75,10 @@ export default {
       type: Array,
       default: () => ([
         { label: 'Me', value: 'Tell me about Julio.', icon: ['far','face-smile'], action: 'fill'},
-        { label: 'Projects', value: 'List my main projects and links.', icon: ['fas','bag-shopping'], action: 'fill'   },
-        { label: 'Skills', value: 'What are my top hard and soft skills?', icon: ['fas','layer-group'], action: 'fill'   },
+        { label: 'Projects', value: 'List my main projects and links.', icon: ['fas','bag-shopping'], action: 'fill'},
+        { label: 'Skills', value: 'What are my top hard and soft skills?', icon: ['fas','layer-group'], action: 'fill'},
         { label: 'Fun', value: 'Share a fun fact about me.', icon: ['fas','wand-magic-sparkles'], action: 'fill' },
-        { label: 'Contact', value: 'How can people contact me?', icon: ['fas','user-lock'], action: 'fill'   }
+        { label: 'Contact', value: 'How can people contact me?', icon: ['fas','user-lock'], action: 'fill'}
       ])
     }
   },
@@ -119,11 +121,25 @@ export default {
 .chat-wrap {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 18px;
   width: 100%;
 }
 
-/* INPUT */
+.ci-row {
+  width: 100%;
+  max-width: 720px;
+  padding: 0 12px;
+}
+
+.ci-presets-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  max-width: 960px;
+  padding: 0 12px;
+}
+
 .chat-input {
   position: relative;
   display: flex;
@@ -151,7 +167,6 @@ export default {
   border: 0;
   outline: none;
   padding: 10px $mg_mini;
-
   &::placeholder { color: $color-text-light; }
 }
 
@@ -169,12 +184,10 @@ export default {
   justify-content: center;
   box-shadow: 0 6px 16px rgba(10,132,255,.35), inset 0 1px 0 rgba(255,255,255,.25);
   transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
-
   &:hover { transform: translateY(-1px); }
   &:active { transform: translateY(0); box-shadow: 0 3px 10px rgba(10,132,255,.35); }
   &:disabled { opacity: .6; cursor: not-allowed; }
 }
-
 .ci-icon { font-size: 18px; }
 
 .ci-spinner {
@@ -183,27 +196,22 @@ export default {
   border-top-color: rgba(255,255,255,1);
   animation: spin 1s linear infinite;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* PRESETS (chips/cards) */
 .ci-presets {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   align-items: stretch;
 
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+  @media (max-width: 900px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   @media (max-width: 520px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+     grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
 }
 
 .ci-chip {
   appearance: none;
-  background: $color-bg-alt;
   border: 1px solid $color-gray-200;
   color: $color-text;
   border-radius: 18px;
@@ -213,30 +221,20 @@ export default {
   gap: 10px;
   justify-content: center;
   cursor: pointer;
-
-  // efeito glass leve
   background: linear-gradient(0deg, rgba(255,255,255,0.65), rgba(255,255,255,0.65)), $gradient-glass;
   box-shadow: 0 6px 16px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,.5);
-
   transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
   &:hover   { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.06); }
   &:active  { transform: translateY(0); }
 }
 
-.ci-chip-icon {
-  font-size: 18px;
-  opacity: .9;
-}
+.ci-chip-icon { font-size: 18px; opacity: .95; filter: drop-shadow(0 1px 1px rgba(0,0,0,.08)); }
+.ci-chip-label { font-weight: 600; font-size: 14px; color: $color-text; }
 
-.ci-chip-label {
-  font-weight: 600;
-  font-size: 14px;
-  color: $color-text;
-}
+.ci-chip:nth-child(1) .ci-chip-icon { color: $color-success; } 
+.ci-chip:nth-child(2) .ci-chip-icon { color: $color-primary; }
+.ci-chip:nth-child(3) .ci-chip-icon { color: $color-purple; }
+.ci-chip:nth-child(4) .ci-chip-icon { color: $color-danger; } 
+.ci-chip:nth-child(5) .ci-chip-icon { color: $color-warning; } 
 
-/* A11y helper */
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
-}
 </style>
