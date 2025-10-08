@@ -1,0 +1,47 @@
+{
+  "owner": {
+    "name": "Julio Zampieri",
+    "title": "Full-Stack & Data Engineer",
+    "location": "São Paulo, Brasil",
+    "email": "julio@email.com",
+    "links": {
+      "github": "https://github.com/jzampieri",
+      "linkedin": "https://www.linkedin.com/in/seuusuario",
+      "site": "https://seusite.com"
+    }
+  },
+  "bio": "Dev Vue 3 (Options API), Laravel/PHP, Data Eng (ADF, Databricks, Spark). Experiência forte nos módulos Negocie Já e Matrícula (Rede Decisão).",
+  "skills": [
+    "Vue 3 (Options API, SCSS, Vite)",
+    "Laravel, MySQL",
+    "ETL: ADF, Databricks, Spark",
+    "DocuSign, JWT",
+    "Dashboards (Power BI / Tableau)"
+  ],
+  "projects": [
+    {
+      "name": "Negocie Já",
+      "role": "Lead Front + Backend",
+      "highlights": [
+        "Módulos Formas de Pagamento, Públicos, Contratos",
+        "Integração DocuSign (JWT, envelopes, PDF)",
+        "Fluxo entrada/parcelas dinâmico com regras por método"
+      ],
+      "stack": ["Vue 3", "Laravel", "MySQL", "DocuSign"]
+    },
+    {
+      "name": "Matrícula",
+      "role": "Full-Stack",
+      "highlights": [
+        "Validações complexas (função/meta/limites)",
+        "Histórico de matrícula e documentos",
+        "Integrações Agenda Edu, GestorClass"
+      ],
+      "stack": ["Laravel", "Vue 3", "MySQL"]
+    }
+  ],
+  "faqs": [
+    { "q": "Qual seu foco atual?", "a": "Construir um portfólio 100% inteligente, com UI inspirada no iOS e respostas só sobre mim." },
+    { "q": "Quais tecnologias domina?", "a": "Vue 3 (Options API), Laravel, Data Eng (ADF, Databricks), DocuSign." }
+  ]
+}

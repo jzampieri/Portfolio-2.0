@@ -1,6 +1,24 @@
 <template>
   <div class="chat-wrap">
   <!-- ROW: INPUT -->
+  <div class="ci-presets-row" v-if="computedPresets.length">
+    <div class="ci-presets" role="list">
+      <button
+        v-for="(item, i) in computedPresets"
+        :key="i"
+        class="ci-chip"
+        type="button"
+        role="listitem"
+        :title="item.label"
+        @click="onPresetClick(item)"
+      >
+        <span class="ci-chip-icon" aria-hidden="true">
+          <fa :icon="item.icon || ['fas','circle']" />
+        </span>
+        <span class="ci-chip-label">{{ item.label }}</span>
+      </button>
+    </div>
+  </div>
   <div class="ci-row">
     <div class="chat-input" :class="{ disabled, loading }">
       <input
@@ -33,24 +51,7 @@
   </div>
 
   <!-- ROW: PRESETS -->
-  <div class="ci-presets-row" v-if="computedPresets.length">
-    <div class="ci-presets" role="list">
-      <button
-        v-for="(item, i) in computedPresets"
-        :key="i"
-        class="ci-chip"
-        type="button"
-        role="listitem"
-        :title="item.label"
-        @click="onPresetClick(item)"
-      >
-        <span class="ci-chip-icon" aria-hidden="true">
-          <fa :icon="item.icon || ['fas','circle']" />
-        </span>
-        <span class="ci-chip-label">{{ item.label }}</span>
-      </button>
-    </div>
-    </div>
+
   </div>
 </template>
 
