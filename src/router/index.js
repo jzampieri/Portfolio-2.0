@@ -9,7 +9,8 @@ const routes = [
     name: 'chat',
     component: Chat,
     props: route => ({ question: route.query.q || '' })
-  }
+  },
+  { path: '/chat/:id?', name: 'chat', component: () => import('@/views/chat/Chat.vue') }
 ]
 
 const router = createRouter({

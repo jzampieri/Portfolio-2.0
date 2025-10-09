@@ -1,6 +1,5 @@
 <template>
   <div class="chat-wrap">
-  <!-- ROW: INPUT -->
   <div class="ci-presets-row" v-if="computedPresets.length">
     <div class="ci-presets" role="list">
       <button
@@ -19,6 +18,7 @@
       </button>
     </div>
   </div>
+
   <div class="ci-row">
     <div class="chat-input" :class="{ disabled, loading }">
       <input
@@ -49,9 +49,6 @@
       </button>
     </div>
   </div>
-
-  <!-- ROW: PRESETS -->
-
   </div>
 </template>
 
@@ -67,19 +64,14 @@ export default {
     autofocus: { type: Boolean, default: false },
     trimOnSubmit: { type: Boolean, default: true },
 
-    /**
-     * presets: [{ label, value, icon?: ['fas','...'], action?: 'fill'|'submit' }]
-     * - fill: preenche o input com o value
-     * - submit: dispara imediatamente o submit com o value
-     */
     presets: {
       type: Array,
       default: () => ([
-        { label: 'Me', value: 'Tell me about Julio.', icon: ['far','face-smile'], action: 'fill'},
-        { label: 'Projects', value: 'List my main projects and links.', icon: ['fas','bag-shopping'], action: 'fill'},
-        { label: 'Skills', value: 'What are my top hard and soft skills?', icon: ['fas','layer-group'], action: 'fill'},
-        { label: 'Fun', value: 'Share a fun fact about me.', icon: ['fas','wand-magic-sparkles'], action: 'fill' },
-        { label: 'Contact', value: 'How can people contact me?', icon: ['fas','user-lock'], action: 'fill'}
+        { label: 'Me', presetId: 'about', icon: ['far','face-smile'], action: 'preset' },
+        { label: 'Projects', presetId: 'projects', icon: ['fas','bag-shopping'], action: 'preset' },
+        { label: 'Skills', presetId: 'skills', icon: ['fas','layer-group'], action: 'preset' },
+        { label: 'Fun', presetId: 'fun', icon: ['fas','wand-magic-sparkles'], action: 'preset' },
+        { label: 'Contact', presetId: 'contact', icon: ['fas','user-lock'], action: 'preset' }
       ])
     }
   },
@@ -105,9 +97,19 @@ export default {
       this.$emit('submit', payload)
     },
     onPresetClick (item) {
+      if (item?.action === 'preset' && item?.presetId) {
+        this.$router.push({
+          name: 'chat',
+          params: { id: item.presetId },
+          state: { presetId: item.presetId, question: item.label }
+        })
+        return
+      }
+
       const value = (item?.value || '').trim()
       if (!value) return
       this.$emit('update:modelValue', value)
+
       if (item.action === 'submit') {
         requestAnimationFrame(() => this.$emit('submit', value))
       } else {
