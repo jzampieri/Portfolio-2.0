@@ -98,11 +98,17 @@ export default {
     },
     onPresetClick (item) {
       if (item?.action === 'preset' && item?.presetId) {
-        this.$router.push({
+        const target = {
           name: 'chat',
           params: { id: item.presetId },
           state: { presetId: item.presetId, question: item.label }
-        })
+        }
+
+        if (this.$route.name === 'chat' && this.$route.params?.id === item.presetId) {
+          this.$router.replace({ ...target, query: { r: Date.now() } })
+        } else {
+          this.$router.push(target)
+        }
         return
       }
 
@@ -116,6 +122,7 @@ export default {
         this.$refs.inputEl?.focus()
       }
     }
+
   }
 }
 </script>
@@ -127,19 +134,26 @@ export default {
   align-items: center;
   gap: 18px;
   width: 100%;
+
+  --ci-max:  clamp(320px, 92vw, 860px);
+  --ci-pad:  clamp(8px,  2.2vw, 14px);
+  --ci-gap:  clamp(8px,  2vw,   12px);
+  --ci-btn:  clamp(40px, 6.2vw, 48px);
+  --ci-fs:   clamp(14px, 2.2vw, 17px);
+  --ci-ico:  clamp(16px, 2.4vw, 18px); 
 }
 
 .ci-row {
   width: 100%;
-  max-width: 720px;
-  padding: 0 12px;
+  max-width: var(--ci-max);
+  padding: 0 15px;
 }
 
 .ci-presets-row {
   width: 100%;
   display: flex;
   justify-content: center;
-  max-width: 960px;
+  max-width: calc(var(--ci-max) + 240px);
   padding: 0 12px;
 }
 
@@ -147,9 +161,9 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--ci-gap);
   width: 100%;
-  padding: 10px;
+  padding: var(--ci-pad);
   border-radius: 999px;
   background: $color-bg-glass;
   backdrop-filter: blur(20px) saturate(150%);
@@ -169,14 +183,14 @@ export default {
   background: transparent;
   border: 0;
   outline: none;
-  padding: 10px $mg_mini;
+  padding: calc(var(--ci-pad) * .6) $mg_mini;
   &::placeholder { color: $color-text-light; }
 }
 
 .ci-send {
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: var(--ci-btn);
+  height: var(--ci-btn);
   border-radius: 999px;
   border: 0;
   cursor: pointer;
@@ -207,10 +221,10 @@ export default {
   gap: 12px;
   align-items: stretch;
 
-  @media (max-width: 900px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  @media (max-width: 520px) {
-     grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
+  @media (max-width: 1024px) { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px)  { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 680px)  { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 520px)  { grid-template-columns: 1fr; }
 }
 
 .ci-chip {
@@ -239,5 +253,9 @@ export default {
 .ci-chip:nth-child(3) .ci-chip-icon { color: $color-purple; }
 .ci-chip:nth-child(4) .ci-chip-icon { color: $color-danger; } 
 .ci-chip:nth-child(5) .ci-chip-icon { color: $color-warning; } 
+
+@media (max-width: 450px) {
+  .chat-input { padding: clamp(0px, 2vw, 10px); }
+}
 
 </style>

@@ -38,22 +38,29 @@
         <component
           v-if="View && isPresetMode"
           :is="View"
+          :key="$route.params.id || $route.query.preset || 'default'"
           class="preset-view"
           v-show="showPreset"
           @chat-meta="onChatMeta"
         />
       </Transition>
+
+      <ChatInput v-model="query" :presets="presets" @submit="goToChat" />
     </section>
+
   </main>
 </template>
 
 <script>
 import { askAgent } from '@/services/agent.service.js'
 import { VIEW_REGISTRY } from '@/views/presets/registry.js'
+import ChatInput from '@/components/ChatInput/ChatInput.vue'
 
 export default {
   name: 'Chat',
+  components: { ChatInput },
   data: () => ({
+    query: '', 
     question: '',
     loading: false,
     typing: false,
@@ -66,33 +73,10 @@ export default {
     defaultAnswerDelay: 900
   }),
   async mounted () {
-    const presetId = this.$route.params?.id || this.$route.query?.preset || this.$route.state?.presetId || null
-    this.isPresetMode = !!presetId
-
-    if (this.isPresetMode) {
-      this.View = VIEW_REGISTRY[presetId] || null
-      this.question = this.$route.state?.question || this.toTitle(presetId)
-      this.loading = true
-      this.showPreset = false
-      return
-    }
-
-    this.question = this.$route.state?.question || sessionStorage.getItem('chat:q') || ''
-    sessionStorage.removeItem('chat:q')
-    if (!this.question) return
-    this.loading = true
-    try {
-      const full = await askAgent(this.question)
-      this.loading = false
-      this.typing = true
-      this.displayedAnswer = ''
-      await this.typeWriter(full)
-      this.typing = false
-    } catch (e) {
-      this.loading = false
-      this.typing = false
-      this.error = 'Erro ao consultar o agente.'
-    }
+    await this.initFromRoute(this.$route)
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.initFromRoute(to).finally(() => next())
   },
   methods: {
     async onChatMeta (meta) {
@@ -103,18 +87,56 @@ export default {
 
       this.question = q
       this.displayedAnswer = ''
+      this.error = ''
       this.typing = false
       this.loading = true
-      this.showPreset = false
+      this.showPreset = false 
 
       await this.sleep(renderDelay)
-      this.showPreset = true
 
-      await this.sleep(answerDelay)
-      this.loading = false
       this.typing = true
       await this.typeWriter(a)
       this.typing = false
+      this.loading = false
+
+      await this.sleep(answerDelay)
+      this.showPreset = true
+    },
+    async initFromRoute (route) {
+      const presetId = route.params?.id || route.query?.preset || route.state?.presetId || null
+      this.isPresetMode = !!presetId
+
+      if (this.isPresetMode) {
+        this.View = VIEW_REGISTRY[presetId] || null
+        this.question = route.state?.question || this.toTitle(presetId)
+        this.displayedAnswer = ''
+        this.error = ''
+        this.typing = false
+        this.loading = true
+        this.showPreset = false
+        return
+      }
+
+      this.question = route.state?.question || sessionStorage.getItem('chat:q') || ''
+      sessionStorage.removeItem('chat:q')
+      if (!this.question) {
+        this.loading = false
+        this.displayedAnswer = ''
+        return
+      }
+      this.loading = true
+      try {
+        const full = await askAgent(this.question)
+        this.loading = false
+        this.typing = true
+        this.displayedAnswer = ''
+        await this.typeWriter(full)
+        this.typing = false
+      } catch (e) {
+        this.loading = false
+        this.typing = false
+        this.error = 'Erro ao consultar o agente.'
+      }
     },
     sleep (ms) { return new Promise(r => setTimeout(r, ms)) },
     async typeWriter (text) {
@@ -126,6 +148,29 @@ export default {
         this.displayedAnswer += chars[i]
         await this.sleep(Math.max(base, delay))
         delay *= accel
+      }
+    },
+    async goToChat (text) {
+      const q = (text || this.query || '').trim()
+      if (!q) return
+
+      this.question = q
+      this.displayedAnswer = ''
+      this.error = ''
+      this.loading = true
+      this.typing = false
+
+      try {
+        const full = await askAgent(q)
+        this.loading = false
+        this.typing = true
+        this.displayedAnswer = ''
+        await this.typeWriter(full)
+        this.typing = false
+      } catch (e) {
+        this.loading = false
+        this.typing = false
+        this.error = 'Erro ao consultar o agente.'
       }
     },
     toTitle (s='') {
