@@ -49,6 +49,15 @@ table {
 
 }
 
+:root { --app-bg: #f5f7fa; }
+
+.app-shell {
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	background: #f5f7fa; 
+}
+
 .chat-input{
 	display: flex;
 	justify-content: center;

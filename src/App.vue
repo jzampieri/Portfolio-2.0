@@ -1,5 +1,7 @@
 <template>
-  <router-view />
+  <main class="app-shell">
+    <router-view />
+  </main>
 </template>
 <script>
 import Home from '@/views/home/Home.vue';

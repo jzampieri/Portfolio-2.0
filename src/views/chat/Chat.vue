@@ -45,7 +45,9 @@
         />
       </Transition>
 
-      <ChatInput v-model="query" :presets="presets" @submit="goToChat" />
+      <footer class="chat-footer">
+        <ChatInput v-model="query" :presets="presets" @submit="goToChat" />
+      </footer>
     </section>
 
   </main>
@@ -186,10 +188,12 @@ main {
    background-color: $color-bg; 
    height: 100vh; 
    width: 100%; 
+   display: flex;
 }
 
 .chat-page { 
   max-width: 800px; 
+  min-width: 800px; 
   margin: 0 auto; 
   padding: 40px 24px; 
   display: flex; 
@@ -314,5 +318,13 @@ main {
    color: #999; 
    text-align: center; 
    font-style: italic; 
+}
+
+.chat-footer {
+  margin-top: auto;
+  position: sticky;
+  bottom: max(env(safe-area-inset-bottom), 16px);
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.02) 40%, rgba(255,255,255,.06) 100%);
 }
 </style>
