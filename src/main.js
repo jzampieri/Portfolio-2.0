@@ -41,7 +41,8 @@ import {
   faNodeJs,
   faAws,
   faPython,
-  faGit
+  faGitAlt,
+  faPhp
 } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
@@ -78,7 +79,8 @@ library.add(
   faNodeJs,
   faAws,
   faPython,
-  faGit
+  faGitAlt,
+  faPhp
 )
 
 const app = createApp(App)

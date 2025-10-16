@@ -186,7 +186,6 @@ export default {
 
 main {
    background-color: $color-bg; 
-   height: 100vh; 
    width: 100%; 
    display: flex;
 }
@@ -202,11 +201,12 @@ main {
 }
 
 .chat-header {
-   display: 
-   flex; 
-   flex-direction: column; 
+   display: block; 
+   flex-direction: column;
+   background-color: #fff;
    align-items: flex-start; 
    gap: 8px; 
+   padding: $mg_mini;
 }
 
 .back-btn {

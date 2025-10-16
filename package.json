@@ -13,7 +13,12 @@
     "@fortawesome/free-regular-svg-icons": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/vue-fontawesome": "^3.1.2",
+    "@iconify-json/devicon": "^1.2.45",
+    "@iconify-json/logos": "^1.2.9",
+    "@iconify-json/simple-icons": "^1.2.54",
+    "@iconify/vue": "^5.0.0",
     "axios": "^1.12.2",
+    "gsap": "^3.13.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
   },
