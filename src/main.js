@@ -26,7 +26,11 @@ import {
   faWater,
   faCodeBranch,
   faFileCode,
-  faHashtag
+  faHashtag,
+  faXmark,
+  faRobot,
+  faPlay,
+  faCoins,
 } from '@fortawesome/free-solid-svg-icons'
 
 // -------- REGULAR (far) --------
@@ -67,6 +71,10 @@ library.add(
   faCodeBranch,
   faFileCode,
   faHashtag,
+  faXmark,
+  faRobot,
+  faPlay,
+  faCoins,
 
   // regular
   faFaceSmile,

@@ -203,7 +203,7 @@ main {
 .chat-header {
    display: block; 
    flex-direction: column;
-   background-color: #fff;
+   // background-color: #fff;
    align-items: flex-start; 
    gap: 8px; 
    padding: $mg_mini;

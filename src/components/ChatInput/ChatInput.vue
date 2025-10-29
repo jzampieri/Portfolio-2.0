@@ -128,6 +128,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .chat-wrap {
   display: flex;
   flex-direction: column;
